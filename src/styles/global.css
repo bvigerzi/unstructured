@@ -26,10 +26,6 @@
 }
 
 /* Base */
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   font-family: var(--font-body);
   font-weight: 300;

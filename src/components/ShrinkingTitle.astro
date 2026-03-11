@@ -1,0 +1,33 @@
+<div class="shrinking-spacer" style="height: 33vh;"></div>
+<header
+  id="shrinking-header"
+  style="position: fixed; top: 0; left: 0; right: 0; z-index: 10; display: flex; align-items: center; justify-content: center; height: 33vh; background-color: var(--color-bg); transition: background-color 0.2s; overflow: hidden;"
+>
+  <a
+    id="shrinking-link"
+    href="/"
+    style="font-family: var(--font-title); font-weight: 600; font-style: italic; font-size: 8rem; color: var(--color-text); text-decoration: none; white-space: nowrap; transition: color 0.2s;"
+  >
+    unstructured
+  </a>
+</header>
+
+<script>
+  const header = document.getElementById('shrinking-header');
+  const link = document.getElementById('shrinking-link');
+  let rafId = 0;
+
+  function handleScroll() {
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
+      const scrollY = window.scrollY;
+      const threshold = window.innerHeight * 0.25;
+      const p = Math.min(scrollY / threshold, 1);
+      if (header) header.style.height = `${33 - p * 25}vh`;
+      if (link) link.style.fontSize = `clamp(2rem, ${8 - p * 6}rem, 8rem)`;
+    });
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  handleScroll();
+</script>
