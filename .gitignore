@@ -21,3 +21,11 @@ node_modules/
 
 # content (pulled from unstructured-content repo at build time)
 src/content/
+
+# Terraform
+infra/**/.terraform/
+infra/**/*.tfstate
+infra/**/*.tfstate.backup
+*.tfvars
+*.tfplan
+infra/**/tfplan
