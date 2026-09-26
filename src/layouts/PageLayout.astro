@@ -1,0 +1,51 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<BaseLayout title={`${title} — unstructured`} description={description}>
+  <header class="page-header">
+    <a href="/" class="site-title">unstructured</a>
+  </header>
+  <main class="prose">
+    <h1>{title}</h1>
+    <slot name="meta" />
+    <article>
+      <slot />
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .page-header {
+    padding: 1.5rem;
+  }
+
+  .site-title {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .site-title:hover {
+    text-decoration: underline;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 1.5rem + 2.5vw, 3rem);
+    margin-bottom: 0.25rem;
+  }
+
+  article {
+    margin-top: 2rem;
+  }
+</style>

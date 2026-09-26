@@ -27,7 +27,8 @@
 │   │   └── posts/               # Markdown blog posts
 │   ├── layouts/
 │   │   ├── BaseLayout.astro     # Root layout: meta, fonts, theme script, nav
-│   │   └── PostLayout.astro     # Wraps BaseLayout for individual posts
+│   │   ├── PageLayout.astro     # Wraps BaseLayout: site title + page title (auxiliary pages)
+│   │   └── PostLayout.astro     # Wraps PageLayout, adds dates and tags for posts
 │   ├── pages/
 │   │   ├── index.astro          # Home — post listing
 │   │   ├── about.astro          # About page
@@ -80,8 +81,13 @@ BaseLayout.astro
 ├── <slot /> (page content)
 └── Nav.astro (footer)
 
-PostLayout.astro (extends BaseLayout)
-├── Post title (h1), pub date, updated date, tags
+PageLayout.astro (extends BaseLayout) — static, undated auxiliary pages (e.g. /about)
+├── Site title link, page title (h1)
+├── <slot name="meta" /> (optional, used by PostLayout)
+└── <slot /> (page content)
+
+PostLayout.astro (extends PageLayout)
+├── meta slot: pub date, updated date, tags
 └── <slot /> (rendered markdown)
 ```
 
@@ -161,8 +167,9 @@ GitHub Actions workflow (`.github/workflows/build.yml`):
 ### Adding a new page
 
 1. Create `src/pages/my-page.astro`
-2. Import and use `BaseLayout` (or `PostLayout` for post-like pages)
-3. The file path becomes the route (`/my-page`)
+2. Import and use `PageLayout` for static auxiliary pages (or `BaseLayout` for fully custom pages)
+3. Add a link in `Nav.astro` if it should appear in the footer
+4. The file path becomes the route (`/my-page`)
 
 ### Modifying styles
 
