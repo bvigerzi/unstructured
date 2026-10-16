@@ -53,3 +53,23 @@ resource "bunnynet_pullzone_edgerule" "www_redirect" {
     parameter1 = "Host"
   }
 }
+
+# AI usage preference on every response (IETF aipref Content-Usage header).
+# Mirrors the Content-Usage line in public/robots.txt; see docs/no-ai-scraping.md.
+resource "bunnynet_pullzone_edgerule" "ai_usage_header" {
+  pullzone    = bunnynet_pullzone.site.id
+  description = "Content-Usage: no AI training or AI use"
+  enabled     = true
+
+  action            = "SetResponseHeader"
+  action_parameter1 = "Content-Usage"
+  action_parameter2 = "train-ai=n, ai-use=n, search=y"
+
+  match_type = "MatchAny"
+
+  triggers {
+    type       = "Url"
+    match_type = "MatchAny"
+    patterns   = ["*"]
+  }
+}
