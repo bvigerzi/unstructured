@@ -64,6 +64,7 @@ Post content here...
 - Scroll-shrinking title
 - Responsive typography
 - Static site generation
+- No-AI scraping policy (robots.txt, IETF `Content-Usage`, TDMRep) — see [docs/no-ai-scraping.md](docs/no-ai-scraping.md)
 
 ## License
 

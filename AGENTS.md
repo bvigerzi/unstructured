@@ -15,7 +15,9 @@
 
 ```
 ├── .github/workflows/       # CI — build.yml
-├── public/                  # Static assets (favicons only)
+├── docs/
+│   └── no-ai-scraping.md    # How the no-AI crawler policy works
+├── public/                  # Static assets: favicons, robots.txt, .well-known/tdmrep.json
 ├── scripts/                 # generate-favicons.sh (Inkscape + ImageMagick)
 ├── src/
 │   ├── components/
@@ -176,6 +178,10 @@ GitHub Actions workflow (`.github/workflows/build.yml`):
 - Edit `src/styles/global.css`
 - Use existing CSS variables for colors and fonts
 - Add dark-mode overrides under `[data-theme='dark']` when introducing new colors
+
+### Updating the AI crawler blocklist
+
+Refresh section 1 of `public/robots.txt` from upstream ai.robots.txt — see [docs/no-ai-scraping.md](./docs/no-ai-scraping.md#refreshing-the-list). Keep `Content-Usage` in robots.txt and the Bunny edge rule in `infra/cdn/main.tf` in sync.
 
 ### Regenerating favicons
 
