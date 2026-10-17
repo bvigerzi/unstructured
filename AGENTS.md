@@ -6,7 +6,8 @@
 | ----------- | --------------------------------- |
 | Framework   | Astro 5 (static site generation)  |
 | Interactive | React 19 (via `@astrojs/react`)   |
-| Content     | Markdown + MDX 4                  |
+| Content     | MDX 4 (Markdown also supported)   |
+| Embeds      | astro-embed (link preview cards)  |
 | Language    | TypeScript 5.7 (strict mode)      |
 | Package Mgr | Yarn                             |
 | Node        | v22 (CI), v18+ (minimum)          |
@@ -26,7 +27,7 @@
 │   │   ├── ShrinkingTitle.astro # Scroll-responsive header
 │   │   └── ThemeToggle.tsx      # Light/dark toggle (React, client:load)
 │   ├── content/                 # GITIGNORED — pulled from external repo
-│   │   └── posts/               # Markdown blog posts
+│   │   └── posts/               # MDX blog posts
 │   ├── layouts/
 │   │   ├── BaseLayout.astro     # Root layout: meta, fonts, theme script, nav
 │   │   ├── PageLayout.astro     # Wraps BaseLayout: site title + page title (auxiliary pages)
@@ -40,7 +41,7 @@
 │   └── types/
 │       └── content.ts           # PostFrontmatter and PostEntry interfaces
 ├── src/content.config.ts        # Content collection schema (Zod)
-├── astro.config.ts              # Astro config (React + MDX integrations)
+├── astro.config.ts              # Astro config (React, astro-embed, MDX integrations)
 └── tsconfig.json                # Extends astro/tsconfigs/strict, react-jsx
 ```
 
@@ -50,11 +51,19 @@ Blog content lives in a **separate repository** (`bvigerzi/unstructured-content`
 
 - `src/content/` is in `.gitignore`
 - CI clones the content repo and copies posts into `src/content/posts/` at build time
-- For local development, symlink or copy markdown files into `src/content/posts/`
+- For local development, symlink or copy post files into `src/content/posts/` (`vite.resolve.preserveSymlinks` in `astro.config.ts` lets symlinked posts resolve imports from this project's `node_modules`)
+
+### Link Preview Cards
+
+Posts are `.mdx` so the `astro-embed` integration can auto-embed URLs. A bare URL **on its own line** becomes a `<LinkPreview>` card (Open Graph title, description and image, fetched at render time in both dev and build). YouTube, Bluesky, Gist, Vimeo, Tweet and Mastodon URLs become rich embeds instead. Inline URLs and `[text](url)` links stay normal links. If a fetch fails, the card falls back to the plain URL.
+
+- `embeds()` must come **before** `mdx()` in `integrations`
+- `astro-embed` is pinned to `~0.13.1`: 0.14+ requires Astro 7
+- Card styles live in `global.css` under `.prose .link-preview`
 
 ### Content Collection Schema
 
-Defined in `src/content.config.ts` using Astro's Content Collections API with a glob loader.
+Defined in `src/content.config.ts` using Astro's Content Collections API with a glob loader (`**/*.{md,mdx}`).
 
 | Field         | Type       | Required | Default |
 | ------------- | ---------- | -------- | ------- |

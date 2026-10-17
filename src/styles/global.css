@@ -117,3 +117,67 @@ img {
   background: none;
   padding: 0;
 }
+
+/* Link preview cards (astro-embed LinkPreview) — horizontal card, thumbnail right.
+   The component's scoped styles load after this file, so the media rules repeat
+   .link-preview to outrank its img selector (specificity 0,3,1). */
+.prose .link-preview {
+  --link-preview-width: 100%;
+  --link-preview-padding-inline: 1rem;
+  --link-preview-padding-block: 0.75rem;
+  --link-preview-corners: 4px;
+  --link-preview-description-lines: 2;
+  margin: 1em 0 1.5em;
+  font-family: var(--font-body);
+}
+
+.prose article.link-preview {
+  flex-direction: row;
+  align-items: stretch;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.prose article.link-preview:hover {
+  border-color: var(--color-muted);
+}
+
+.prose .link-preview .link-preview__content {
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.prose .link-preview .link-preview__title {
+  color: var(--color-text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.prose .link-preview .link-preview__domain,
+.prose .link-preview .link-preview__description {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.prose article.link-preview.link-preview img,
+.prose article.link-preview.link-preview video {
+  flex-shrink: 0;
+  width: 9rem;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+@media (max-width: 30rem) {
+  .prose article.link-preview {
+    flex-direction: column-reverse;
+  }
+
+  .prose article.link-preview.link-preview img,
+  .prose article.link-preview.link-preview video {
+    width: 100%;
+    aspect-ratio: 1200 / 630;
+  }
+}
