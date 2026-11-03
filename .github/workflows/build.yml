@@ -3,7 +3,14 @@ name: Build & Deploy
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
+
+# Cancel superseded PR runs; never cancel an in-flight deploy on main.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -28,7 +35,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22.22"
+          node-version: "26"
           cache: yarn
 
       - name: Install dependencies
@@ -38,7 +45,7 @@ jobs:
         run: yarn build
 
       - name: Deploy to Bunny.net
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: R-J-dev/bunny-deploy@ae25fa670b732ffc8dba84c872fb203d2a365229 # v3.0.0
         with:
           directory-to-upload: "dist"
