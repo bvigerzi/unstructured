@@ -1,5 +1,6 @@
 ---
-import ThemeToggle from '../components/ThemeToggle.tsx';
+import { Font } from 'astro:assets';
+import ThemeToggle from '../components/ThemeToggle.astro';
 import Nav from '../components/Nav.astro';
 import '../styles/global.css';
 
@@ -25,12 +26,8 @@ const { title = 'unstructured', description = 'A minimalistic blog' } = Astro.pr
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300&family=Playfair+Display:ital,wght@1,600&display=swap"
-      rel="stylesheet"
-    />
+    <Font cssVariable="--font-title" preload />
+    <Font cssVariable="--font-body" preload />
     <script is:inline>
       (function () {
         const saved = localStorage.getItem('theme');
@@ -40,7 +37,7 @@ const { title = 'unstructured', description = 'A minimalistic blog' } = Astro.pr
     </script>
   </head>
   <body>
-    <ThemeToggle client:load />
+    <ThemeToggle />
     <main><slot /></main>
     <Nav />
   </body>

@@ -1,0 +1,46 @@
+<button class="theme-toggle" type="button" aria-label="Toggle colour theme"></button>
+
+<script is:inline>
+  // Inline (not bundled) so the toggle adds no request to the critical chain.
+  // The glyph comes from CSS keyed on data-theme, so it's correct on first paint.
+  (function () {
+    const root = document.documentElement;
+    const button = document.querySelector('.theme-toggle');
+    const label = () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      button.setAttribute('aria-label', `Switch to ${next} mode`);
+    };
+    label();
+    button.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      label();
+    });
+  })();
+</script>
+
+<style>
+  .theme-toggle {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 100;
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.25rem;
+    transition: color 0.2s;
+  }
+
+  .theme-toggle::before {
+    content: '●';
+  }
+
+  :global([data-theme='dark']) .theme-toggle::before {
+    content: '○';
+  }
+</style>
