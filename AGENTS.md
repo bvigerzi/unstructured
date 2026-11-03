@@ -23,11 +23,12 @@
 ├── src/
 │   ├── components/
 │   │   ├── Nav.astro            # Footer navigation
+│   │   ├── PostImage.astro      # Responsive renderer for Markdown images in posts
 │   │   ├── PostList.astro       # Blog listing (sorted by date desc)
 │   │   ├── ShrinkingTitle.astro # Scroll-responsive header
 │   │   └── ThemeToggle.tsx      # Light/dark toggle (React, client:load)
 │   ├── content/                 # GITIGNORED — pulled from external repo
-│   │   └── posts/               # MDX blog posts
+│   │   └── posts/               # MDX blog posts, one folder per post (<slug>/<slug>.mdx + images/)
 │   ├── layouts/
 │   │   ├── BaseLayout.astro     # Root layout: meta, fonts, theme script, nav
 │   │   ├── PageLayout.astro     # Wraps BaseLayout: site title + page title (auxiliary pages)
@@ -53,6 +54,29 @@ Blog content lives in a **separate repository** (`bvigerzi/unstructured-content`
 - CI clones the content repo and copies posts into `src/content/posts/` at build time
 - For local development, symlink or copy post files into `src/content/posts/` (`vite.resolve.preserveSymlinks` in `astro.config.ts` lets symlinked posts resolve imports from this project's `node_modules`)
 
+### Post Layout and IDs
+
+Each post lives in its own folder: `posts/<slug>/<slug>.mdx`, with an optional `posts/<slug>/images/`. The glob loader in `src/content.config.ts` sets a custom `generateId` that uses the **filename only** (without extension) as the post id, so `my-post/my-post.mdx` maps to `/posts/my-post`. Flat files (`posts/my-post.mdx`) produce the same id, so both layouts work. Without the custom `generateId`, Astro's default id would be `my-post/my-post`, which breaks the single-segment `[slug].astro` route.
+
+- Don't remove `generateId` while any post uses the folder layout
+- Two posts with the same filename in different folders collide (Astro warns about duplicate ids)
+- After moving post files locally, run `yarn build --force` (or `yarn dev --force`) once. The content-layer cache in `node_modules/.astro/` keeps stale file paths for unchanged entries, and the build fails with `failed to resolve import "astro:content-layer-deferred-module?...fileName=<old path>"`. CI always starts from a fresh checkout, so it's unaffected
+
+### Post Images
+
+Posts reference images with relative Markdown paths: `![alt](./images/photo.jpg)`. MDX turns these into Astro's `<Image>` component. `pages/posts/[slug].astro` overrides it with `<Content components={{ img: PostImage }} />`, and `components/PostImage.astro` renders a responsive image sized to the post column. Astro's built-in asset pipeline (`astro:assets` + `sharp`) then:
+
+- Generates a WebP `srcset` in `dist/_astro/<name>.<hash>.webp`, using `layout="constrained"` with `width` set to the column's content width (`COLUMN_WIDTH = 624`: `.prose` 42rem max-width minus 2 × 1.5rem padding). Widths run from 624px to 2× (1248px) and are never larger than the original. The original is never emitted, so authors don't need to resize. Smaller images keep their own width and aren't upscaled
+- Adds `width`/`height`, `sizes`, `loading="lazy"` and `decoding="async"`
+- If `.prose` width or padding changes, update `COLUMN_WIDTH` to match
+- Strips EXIF/GPS metadata from the output
+- Fails the build on a missing file, so a broken reference never deploys
+- Only emits images that a post references, so unreferenced files in the content repo are never deployed
+
+No separate upload step exists: CI's `cp -r _content/posts/*` copies image folders along with posts, and the Bunny deploy uploads `dist/`. Because `enable-delete-action` is on, images removed from posts are deleted from the storage zone on the next deploy. Hashed filenames mean a changed image gets a new URL, so there's no stale CDN cache.
+
+Styles: `.prose p > img` in `global.css`. It's scoped to `p > img` so link preview card thumbnails are unaffected.
+
 ### Link Preview Cards
 
 Posts are `.mdx` so the `astro-embed` integration can auto-embed URLs. A bare URL **on its own line** becomes a `<LinkPreview>` card (Open Graph title, description and image, fetched at render time in both dev and build). YouTube, Bluesky, Gist, Vimeo, Tweet and Mastodon URLs become rich embeds instead. Inline URLs and `[text](url)` links stay normal links. If a fetch fails, the card falls back to the plain URL.
@@ -64,7 +88,7 @@ Posts are `.mdx` so the `astro-embed` integration can auto-embed URLs. A bare UR
 
 ### Content Collection Schema
 
-Defined in `src/content.config.ts` using Astro's Content Collections API with a glob loader (`**/*.{md,mdx}`).
+Defined in `src/content.config.ts` using Astro's Content Collections API with a glob loader (`**/*.{md,mdx}`, filename-based `generateId`, see above).
 
 | Field         | Type       | Required | Default |
 | ------------- | ---------- | -------- | ------- |
