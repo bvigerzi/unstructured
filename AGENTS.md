@@ -64,7 +64,7 @@ Each post lives in its own folder: `posts/<slug>/<slug>.mdx`, with an optional `
 
 ### Post Images
 
-Posts reference images with relative Markdown paths: `![alt](./images/photo.jpg)`. MDX turns these into Astro's `<Image>` component. `pages/posts/[slug].astro` overrides it with `<Content components={{ img: PostImage }} />`, and `components/PostImage.astro` renders a responsive image sized to the post column. Astro's built-in asset pipeline (`astro:assets` + `sharp`) then:
+Posts reference images with relative Markdown paths: `![alt](./images/photo.jpg)`. MDX turns these into Astro's `<Image>` component. `pages/posts/[slug].astro` overrides it with `<Content components={{ img: PostImage }} />`, and `components/PostImage.astro` renders a responsive image sized to the post column inside a `<figure class="post-image">`, with the alt text repeated as an italic `<figcaption>` (`aria-hidden` so screen readers don't read it twice; omitted when alt is empty). Markdown wraps a standalone image in `<p>`, which can't contain a `<figure>`, so `rehype-unwrap-images` (in `markdown.rehypePlugins`, inherited by MDX) removes that wrapper. Astro's built-in asset pipeline (`astro:assets` + `sharp`) then:
 
 - Generates a WebP `srcset` in `dist/_astro/<name>.<hash>.webp`, using `layout="constrained"` with `width` set to the column's content width (`COLUMN_WIDTH = 624`: `.prose` 42rem max-width minus 2 × 1.5rem padding). Widths run from 624px to 2× (1248px) and are never larger than the original. The original is never emitted, so authors don't need to resize. Smaller images keep their own width and aren't upscaled
 - Adds `width`/`height`, `sizes`, `loading="lazy"` and `decoding="async"`
@@ -75,7 +75,7 @@ Posts reference images with relative Markdown paths: `![alt](./images/photo.jpg)
 
 No separate upload step exists: CI's `cp -r _content/posts/*` copies image folders along with posts, and the Bunny deploy uploads `dist/`. Because `enable-delete-action` is on, images removed from posts are deleted from the storage zone on the next deploy. Hashed filenames mean a changed image gets a new URL, so there's no stale CDN cache.
 
-Styles: `.prose p > img` in `global.css`. It's scoped to `p > img` so link preview card thumbnails are unaffected.
+Styles: `.prose .post-image` (and its `img` / `figcaption`) in `global.css`. It's scoped to the class so link preview card thumbnails are unaffected.
 
 ### Link Preview Cards
 

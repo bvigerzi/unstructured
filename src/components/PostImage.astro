@@ -21,6 +21,7 @@ interface Props {
 const { src, alt, title } = Astro.props;
 ---
 
+<figure class="post-image">
 {
   typeof src === 'string' ? (
     // Remote URLs aren't processed by astro:assets unless allowed in
@@ -36,3 +37,9 @@ const { src, alt, title } = Astro.props;
     />
   )
 }
+{
+  // The alt text doubles as a visible caption. aria-hidden stops screen
+  // readers announcing it twice (they already read the img's alt).
+  alt && <figcaption aria-hidden="true">{alt}</figcaption>
+}
+</figure>
