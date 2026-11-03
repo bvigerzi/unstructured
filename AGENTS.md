@@ -4,13 +4,13 @@
 
 | Layer       | Technology                        |
 | ----------- | --------------------------------- |
-| Framework   | Astro 5 (static site generation)  |
+| Framework   | Astro 7 (static site generation)  |
 | Interactive | React 19 (via `@astrojs/react`)   |
-| Content     | MDX 4 (Markdown also supported)   |
+| Content     | MDX 8 (Markdown also supported)   |
 | Embeds      | astro-embed (link preview cards)  |
 | Language    | TypeScript 5.7 (strict mode)      |
 | Package Mgr | Yarn                             |
-| Node        | v22 (CI), v18+ (minimum)          |
+| Node        | v22.22+ (CI and minimum)          |
 
 ## Directory Structure
 
@@ -58,7 +58,8 @@ Blog content lives in a **separate repository** (`bvigerzi/unstructured-content`
 Posts are `.mdx` so the `astro-embed` integration can auto-embed URLs. A bare URL **on its own line** becomes a `<LinkPreview>` card (Open Graph title, description and image, fetched at render time in both dev and build). YouTube, Bluesky, Gist, Vimeo, Tweet and Mastodon URLs become rich embeds instead. Inline URLs and `[text](url)` links stay normal links. If a fetch fails, the card falls back to the plain URL.
 
 - `embeds()` must come **before** `mdx()` in `integrations`
-- `astro-embed` is pinned to `~0.13.1`: 0.14+ requires Astro 7
+- `astro-embed` is pinned to `~0.14.0` (requires Astro 7.2.4+)
+- Its URL transform is a remark plugin, so `astro.config.ts` sets `markdown.processor: unified()` (from `@astrojs/markdown-remark`) instead of Astro 7's default Sätteri processor. Without it the build fails, or (under Sätteri) bare URLs render as plain text
 - Card styles live in `global.css` under `.prose .link-preview`
 
 ### Content Collection Schema
@@ -157,7 +158,7 @@ GitHub Actions workflow (`.github/workflows/build.yml`):
   1. Checkout this repo
   2. Checkout `bvigerzi/unstructured-content` (main branch, using `CONTENT_REPO_TOKEN` secret)
   3. Copy content into `src/content/posts/`
-  4. Setup Node.js v22 with yarn caching
+  4. Setup Node.js v22.22 with yarn caching
   5. `yarn install --frozen-lockfile`
   6. `yarn build`
 
