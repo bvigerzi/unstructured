@@ -55,7 +55,8 @@ resource "bunnynet_pullzone_edgerule" "www_redirect" {
 }
 
 # AI usage preference on every response (IETF aipref Content-Usage header).
-# Mirrors the Content-Usage line in public/robots.txt; see docs/no-ai-scraping.md.
+# This header is the only place Content-Usage is published (not robots.txt);
+# see docs/no-ai-scraping.md.
 resource "bunnynet_pullzone_edgerule" "ai_usage_header" {
   pullzone    = bunnynet_pullzone.site.id
   description = "Content-Usage: no AI training or AI use"

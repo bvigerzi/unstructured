@@ -5,7 +5,7 @@ A blog about language, structure, and thought in the era of LLMs.
 ## Tech stack
 
 - [Astro 7](https://astro.build/) — static site generator
-- [React 19](https://react.dev/) — interactive components
+- [React 19](https://react.dev/) — available for interactive components (none currently ship to the client)
 - [TypeScript](https://www.typescriptlang.org/)
 - [MDX](https://mdxjs.com/) — Markdown with JSX support
 

@@ -11,7 +11,7 @@ crawlers.
 | Layer | File | Read by | Status |
 | --- | --- | --- | --- |
 | Named-crawler blocks | `public/robots.txt` | All major AI vendors' crawlers | RFC 9309 (standard) |
-| `Content-Usage` (robots.txt + HTTP header) | `public/robots.txt`, `infra/cdn/main.tf` | Crawlers adopting IETF AI Preferences | IETF Internet-Draft |
+| `Content-Usage` (HTTP header) | `infra/cdn/main.tf` | Crawlers adopting IETF AI Preferences | IETF Internet-Draft |
 | `Content-Signal` | `public/robots.txt` | Crawlers honouring Cloudflare's Content Signals Policy | Industry convention |
 | TDMRep | `public/.well-known/tdmrep.json`, `<meta name="tdm-reservation">` | EU text-and-data-mining tooling | W3C Community Group spec |
 
@@ -85,16 +85,19 @@ Content-Usage: train-ai=n, ai-use=n, search=y
 
 - Only bare `y` and `n` are valid. Values like `no` or `"n"` are read as
   "unknown", not as a refusal.
-- Robots.txt controls two separate things. `Allow`/`Disallow` decides what
-  may be **fetched**, and `Content-Usage` states how fetched content may be
-  **used**. That's why the line sits in the `User-agent: *` group: it covers
-  crawlers that are allowed in, such as search engines.
-- The same preference is sent as an HTTP response header on every request.
-  A Bunny.net edge rule (`bunnynet_pullzone_edgerule.ai_usage_header` in
+- The preference is sent as an HTTP response header on every request. A
+  Bunny.net edge rule (`bunnynet_pullzone_edgerule.ai_usage_header` in
   `infra/cdn/main.tf`) adds it. The header goes with the content itself, so
   the preference still applies to copies obtained some other way, such as a
   cache, an archive or a dataset. Apply it with `terraform apply` in
   `infra/cdn`.
+- The attach draft also allows a `Content-Usage` line in robots.txt, but the
+  site **deliberately leaves it out**. Lighthouse's robots.txt audit fails on
+  any directive outside a fixed safelist (`content-signal` is on it,
+  `content-usage` isn't), which marks the whole file "not valid" and lowers
+  the SEO score. Search engines would ignore the line anyway (RFC 9309
+  §2.2.4), so it only cost points. Don't add it back unless Lighthouse adds
+  it to `DIRECTIVE_SAFELIST` in `core/audits/seo/robots-txt.js`.
 
 ## 3. `Content-Signal`: Cloudflare Content Signals Policy
 
@@ -111,8 +114,8 @@ the line. It's included alongside `Content-Usage` until the IETF draft
 becomes final.
 
 Under RFC 9309 §2.2.4, crawlers must ignore rule lines they don't
-recognise. Neither line in sections 2 or 3 can change how a search engine
-crawls the site.
+recognise, so this line can't change how a search engine crawls the site.
+Lighthouse's robots.txt audit accepts it.
 
 ## 4. TDMRep: EU text-and-data-mining reservation
 

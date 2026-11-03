@@ -9,9 +9,7 @@
 
 /* Custom properties */
 :root {
-  --font-title: 'Playfair Display', Georgia, serif;
-  --font-body: 'DM Sans', system-ui, sans-serif;
-
+  /* --font-title and --font-body are defined by <Font /> (astro.config.ts) */
   --color-bg: #fff;
   --color-text: #000;
   --color-muted: #666;

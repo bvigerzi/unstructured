@@ -26,7 +26,7 @@
 │   │   ├── PostImage.astro      # Responsive renderer for Markdown images in posts
 │   │   ├── PostList.astro       # Blog listing (sorted by date desc)
 │   │   ├── ShrinkingTitle.astro # Scroll-responsive header
-│   │   └── ThemeToggle.tsx      # Light/dark toggle (React, client:load)
+│   │   └── ThemeToggle.astro    # Light/dark toggle (inline script, no framework JS)
 │   ├── content/                 # GITIGNORED — pulled from external repo
 │   │   └── posts/               # MDX blog posts, one folder per post (<slug>/<slug>.mdx + images/)
 │   ├── layouts/
@@ -105,15 +105,15 @@ Posts with `draft: true` are filtered out of public pages.
 
 - **Default to `.astro` components.** Use Astro components for anything that doesn't need client-side interactivity.
 - **Use `.tsx` (React) only when client-side state or effects are needed.** Add the `client:load` directive when importing React components into Astro templates.
-- Currently only `ThemeToggle.tsx` is a React component — everything else is Astro.
+- There are currently no React components, so no framework JS ships to the client. The `@astrojs/react` integration stays installed for when one is genuinely needed. Small interactions (like `ThemeToggle.astro`) use an `is:inline` script instead, so they add no request to the critical path.
 
 ### Layout Hierarchy
 
 ```
 BaseLayout.astro
 ├── Inline <script> for theme flash prevention (reads localStorage)
-├── <head>: meta, Google Fonts (Playfair Display, DM Sans), favicon links
-├── ThemeToggle.tsx (client:load)
+├── <head>: meta, <Font /> (self-hosted, preloaded), favicon links
+├── ThemeToggle.astro
 ├── <slot /> (page content)
 └── Nav.astro (footer)
 
@@ -131,7 +131,7 @@ PostLayout.astro (extends PageLayout)
 
 All styles are in `src/styles/global.css`. No CSS frameworks, preprocessors, or CSS-in-JS.
 
-- **Fonts:** Playfair Display (titles, serif, italic 600) · DM Sans (body, sans-serif, 300)
+- **Fonts:** Playfair Display (titles, serif, italic 600) · DM Sans (body, sans-serif, 300). Configured in `astro.config.ts` via Astro's Fonts API (`fonts`, Google provider): files are downloaded at build time, served from `/_astro/fonts/`, and preloaded by `<Font />` in BaseLayout, with metric-matched fallbacks generated automatically. Don't link to fonts.googleapis.com (it adds an HTML → CSS → font request chain). To add a weight/style, edit `weights`/`styles` in the config.
 - **Layout:** max-width `42rem` for prose content
 - **Responsive type:** `clamp()` for fluid font sizes
 - **Transitions:** smooth color/background transitions for theme switching
@@ -140,9 +140,11 @@ All styles are in `src/styles/global.css`. No CSS frameworks, preprocessors, or 
 ### CSS Variables
 
 ```css
+/* Defined by <Font /> from astro.config.ts, not global.css */
+--font-title  /* Playfair Display, Georgia, serif */
+--font-body   /* DM Sans, system-ui, sans-serif */
+
 /* Light (default) */
---font-title: 'Playfair Display', Georgia, serif;
---font-body: 'DM Sans', system-ui, sans-serif;
 --color-bg: #fff;
 --color-text: #000;
 --color-muted: #666;
@@ -160,7 +162,7 @@ All styles are in `src/styles/global.css`. No CSS frameworks, preprocessors, or 
 Theme is controlled by the `data-theme` attribute on `<html>`.
 
 1. **Flash prevention:** An inline `<script>` in BaseLayout reads `localStorage('theme')`, falling back to `prefers-color-scheme`, and sets `data-theme` before first paint.
-2. **ThemeToggle.tsx** reads the current attribute on mount, toggles between `'light'` and `'dark'`, and persists to localStorage.
+2. **ThemeToggle.astro** toggles between `'light'` and `'dark'` and persists to localStorage via an inline script. Its glyph (● / ○) comes from CSS keyed on `[data-theme]`, so it's correct on first paint without hydration.
 3. CSS variables under `[data-theme='dark']` handle all color changes.
 
 ## Commands
@@ -217,7 +219,7 @@ GitHub Actions workflow (`.github/workflows/build.yml`):
 
 ### Updating the AI crawler blocklist
 
-Refresh section 1 of `public/robots.txt` from upstream ai.robots.txt — see [docs/no-ai-scraping.md](./docs/no-ai-scraping.md#refreshing-the-list). Keep `Content-Usage` in robots.txt and the Bunny edge rule in `infra/cdn/main.tf` in sync.
+Refresh section 1 of `public/robots.txt` from upstream ai.robots.txt — see [docs/no-ai-scraping.md](./docs/no-ai-scraping.md#refreshing-the-list). Don't add `Content-Usage` back to robots.txt (it fails Lighthouse's robots.txt audit); it lives only in the Bunny edge rule in `infra/cdn/main.tf`.
 
 ### Regenerating favicons
 

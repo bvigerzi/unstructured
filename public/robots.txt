@@ -205,13 +205,13 @@ Disallow: /
 # 2. Everyone else (Googlebot, Bingbot, DuckDuckBot, ...): crawl allowed,
 #    with machine-readable usage preferences for whatever is crawled.
 #
-# Content-Usage  IETF AI Preferences (draft-ietf-aipref-attach-05,
-#                draft-ietf-aipref-vocab-08). Tokens are bare y / n.
 # Content-Signal Cloudflare Content Signals Policy (contentsignals.org).
+#                Crawlers that don't understand it ignore it (RFC 9309 §2.2.4).
 #
-# Crawlers that don't understand these lines ignore them (RFC 9309 §2.2.4).
+# The IETF aipref Content-Usage preference is sent as an HTTP response
+# header (infra/cdn/main.tf), not here: Lighthouse fails the robots.txt
+# audit on any directive outside its safelist, and Content-Usage isn't on it.
 # ---------------------------------------------------------------------------
 User-agent: *
-Content-Usage: train-ai=n, ai-use=n, search=y
 Content-Signal: search=yes, ai-input=no, ai-train=no
 Allow: /
