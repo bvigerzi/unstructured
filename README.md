@@ -4,14 +4,14 @@ A blog about language, structure, and thought in the era of LLMs.
 
 ## Tech stack
 
-- [Astro 5](https://astro.build/) — static site generator
+- [Astro 7](https://astro.build/) — static site generator
 - [React 19](https://react.dev/) — interactive components
 - [TypeScript](https://www.typescriptlang.org/)
 - [MDX](https://mdxjs.com/) — Markdown with JSX support
 
 ## Getting started
 
-**Prerequisites:** Node.js (v18+)
+**Prerequisites:** Node.js (v22.22+)
 
 ```bash
 # Install dependencies
