@@ -34,29 +34,14 @@ src/
 ├── pages/          # Route pages
 ├── layouts/        # Page layouts
 ├── components/     # React & Astro components
-├── content/posts/  # Blog posts (Markdown)
+├── content/posts/  # Blog posts (gitignored, from unstructured-content)
 ├── styles/         # Global styles
 └── content.config.ts
 ```
 
 ## Adding content
 
-Create a `.md` file in `src/content/posts/` with the following frontmatter:
-
-```md
----
-title: "Post Title"
-pubDate: 2026-01-15
-description: "Optional summary"  # optional
-tags: ["tag1", "tag2"]           # optional, defaults to []
-draft: false                     # optional, defaults to false
-updatedDate: 2026-02-01          # optional
----
-
-Post content here...
-```
-
-**Required:** `title`, `pubDate`
+Posts live in the separate `bvigerzi/unstructured-content` repo, one folder per post (`posts/my-post/my-post.mdx`, with images in `posts/my-post/images/`). See that repo's README for the frontmatter, image and embed conventions. CI copies the posts into `src/content/posts/` at build time; locally, symlink `src/content` to your checkout of the content repo.
 
 ## Features
 

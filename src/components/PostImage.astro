@@ -1,0 +1,38 @@
+---
+// Renders Markdown images in posts (`![alt](./images/x.jpg)`) as responsive
+// images. Wired up via `<Content components={{ img: PostImage }} />` in
+// pages/posts/[slug].astro.
+//
+// Images are sized to the post column, so authors can commit originals at any
+// size: the srcset tops out at 2x the column width (for high-DPI screens) and
+// the original is never served.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+// Content width of `.prose`: 42rem max-width minus 2 × 1.5rem padding, at 16px/rem.
+const COLUMN_WIDTH = 624;
+
+interface Props {
+  src: ImageMetadata | string;
+  alt: string;
+  title?: string;
+}
+
+const { src, alt, title } = Astro.props;
+---
+
+{
+  typeof src === 'string' ? (
+    // Remote URLs aren't processed by astro:assets unless allowed in
+    // `image.domains`, so this branch is a plain fallback.
+    <img src={src} alt={alt} title={title} loading="lazy" decoding="async" />
+  ) : (
+    <Image
+      src={src}
+      alt={alt}
+      title={title}
+      layout="constrained"
+      width={Math.min(src.width, COLUMN_WIDTH)}
+    />
+  )
+}
