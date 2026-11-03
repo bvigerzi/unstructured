@@ -153,14 +153,16 @@ There is no test suite or linter configured. Use `yarn build` to verify changes.
 
 GitHub Actions workflow (`.github/workflows/build.yml`):
 
-- **Triggers:** push to `main`, manual `workflow_dispatch`
+- **Triggers:** push to `main`, pull requests targeting `main`, manual `workflow_dispatch`
+- **PR checks:** the `build` job runs on every PR and must pass before merging (enforced via a required status check on `main`). PR runs build only — they never deploy. Superseded PR runs are cancelled
 - **Steps:**
   1. Checkout this repo
   2. Checkout `bvigerzi/unstructured-content` (main branch, using `CONTENT_REPO_TOKEN` secret)
   3. Copy content into `src/content/posts/`
-  4. Setup Node.js v22.22 with yarn caching
+  4. Setup Node.js v26 (LTS) with yarn caching
   5. `yarn install --frozen-lockfile`
   6. `yarn build`
+  7. Deploy `dist/` to Bunny.net (push to `main` / manual dispatch on `main` only)
 
 ## Common Tasks
 
